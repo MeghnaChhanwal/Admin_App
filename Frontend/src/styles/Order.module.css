@@ -1,0 +1,237 @@
+
+.container {
+  max-width: 1280px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+.title {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 30px;
+  color: #0a0909;
+}
+
+.orderGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* Card */
+.orderCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+  animation: fadeInUp 0.5s ease forwards;
+  opacity: 0;
+}
+
+.orderCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+/* Fade-in animation */
+@keyframes fadeInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Status line */
+.statusLine {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.status {
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.duration {
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
+.processing {
+  background-color: #f0ad4e;
+}
+.served {
+  background-color: #5cb85c;
+}
+.notpickedup {
+  background-color: #d9534f;
+}
+.done {
+  background-color: #0275d8;
+}
+
+/* Items */
+.items {
+  font-size: 0.95rem;
+  color: #444;
+  margin-bottom: 12px;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.instructions {
+  margin-top: 10px;
+  font-style: italic;
+  color: #666;
+}
+
+/* Meta info */
+.metaInfo {
+  font-size: 0.88rem;
+  color: #555;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+  margin-bottom: 12px;
+}
+
+/* Edit section */
+.editSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  
+}
+
+.editSection label {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #333;
+}
+
+.editSection select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1.5px solid #ccc;
+  font-size: 1rem;
+  transition: border-color 0.25s ease;
+}
+
+.editSection select:focus {
+  border-color: #0275d8;
+  outline: none;
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: white;
+  transition: background-color 0.25s ease, transform 0.15s ease;
+}
+
+button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.saveBtn {
+  background-color: #28a745;
+}
+.saveBtn:hover:not(:disabled) {
+  background-color: #218838;
+  transform: scale(1.05);
+}
+
+.cancelBtn {
+  background-color: #dc3545;
+}
+.cancelBtn:hover:not(:disabled) {
+  background-color: #c82333;
+  transform: scale(1.05);
+}
+
+.editBtn {
+  background-color: #007bff;
+  align-self: flex-end;
+  margin-top: 20px;
+}
+.editBtn:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+/* Assign dropdowns */
+.chefAssign,
+.tableAssign {
+  margin-bottom: 12px;
+}
+
+.chefAssign label,
+.tableAssign label {
+  font-weight: 600;
+  display: block;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+/* Status button group */
+.btnGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.statusBtn {
+  flex: 1 1 48%;
+  background-color: #888;
+  padding: 8px 0;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background-color 0.25s ease, transform 0.15s ease;
+  color: #e8e8e8;
+  text-align: center;
+}
+
+.statusBtn:hover:not(:disabled) {
+  background-color: #241515;
+  transform: scale(1.05);
+}
+
+.statusBtn:disabled {
+  background-color: #bbb;
+  cursor: not-allowed;
+}
+
+.active {
+  background-color: #0275d8 !important;
+  box-shadow: 0 0 8px #0275d8aa;
+}
+
+/* Responsive for mobile */
+@media (max-width: 768px) {
+  .orderGrid {
+    grid-template-columns: 1fr;
+  }
+}
