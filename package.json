@@ -9,7 +9,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "��#\u0000 \u0000A\u0000d\u0000m\u0000i\u0000n\u0000_\u0000A\u0000p\u0000p\u0000\r\u0000 \u0000",
   "dependencies": {
     "backend": "file:",
     "body-parser": "^2.2.0",
@@ -17,5 +17,16 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "mongoose": "^8.15.1"
-  }
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MeghnaChhanwal/Admin_App.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MeghnaChhanwal/Admin_App/issues"
+  },
+  "homepage": "https://github.com/MeghnaChhanwal/Admin_App#readme"
 }

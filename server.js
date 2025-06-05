@@ -1,10 +1,11 @@
 // server.js
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-require("dotenv").config(); // If using .env locally
+require("dotenv").config(); // Load .env before using any env variable
 
-// Import routes
+// Routes
 const tableRoutes = require("./routes/table");
 const orderRoutes = require("./routes/order");         // Optional
 const chefRoutes = require("./routes/chef");           // Optional
@@ -19,17 +20,28 @@ app.use(express.json());
 // MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI;
 
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log("✅ MongoDB connected successfully"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+if (!MONGODB_URI) {
+  console.error("❌ MONGODB_URI is undefined. Check your .env file.");
+  process.exit(1); // Exit if URI is missing
+}
 
-// Route mounting
+mongoose.connect(MONGODB_URI, {
+  useNewUrlParser: true, // Optional, now deprecated
+  useUnifiedTopology: true, // Optional, now deprecated
+})
+  .then(() => console.log("✅ MongoDB connected successfully"))
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err);
+    process.exit(1);
+  });
+
+// Routes
 app.use("/api/tables", tableRoutes);
 app.use("/api/orders", orderRoutes);         // Optional
 app.use("/api/chefs", chefRoutes);           // Optional
 app.use("/api/dashboard", dashboardRoutes);  // Optional
 
-// Health check route
+// Health check
 app.get("/", (req, res) => {
   res.send("🚀 Table Management Backend Running");
 });
