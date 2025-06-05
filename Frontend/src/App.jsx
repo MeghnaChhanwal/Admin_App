@@ -1,11 +1,11 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/SideBar";
-import Dashboard from "./pages/Dashboard";
-import TableManagement from "./pages/TableManagement";
-import OrderManagement from "./pages/Order";
+import Dashboard from "./Pages/Dashboard";
+import TableManagement from "./Pages/TableManagement";
+import OrderManagement from "./Pages/Order";
 
-import './App.css';
+import "./App.css";
 
 function App() {
   return (

@@ -30,7 +30,9 @@
   border-radius: 10px;
   padding: 6px;
   box-shadow: 0 4px 10px rgba(255, 255, 255, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .logo:hover {
@@ -42,7 +44,9 @@
   font-size: 22px;
   color: #cbd5e1;
   margin: 22px 0;
-  transition: color 0.3s ease, transform 0.2s ease;
+  transition:
+    color 0.3s ease,
+    transform 0.2s ease;
   position: relative;
 }
 

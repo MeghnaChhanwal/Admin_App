@@ -10,7 +10,7 @@
   border-radius: 12px;
   border: 1px solid #ccc;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: border 0.3s ease;
 }
 

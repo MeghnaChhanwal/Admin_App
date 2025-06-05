@@ -14,7 +14,7 @@ const Dashboard = () => {
     orderSummary: { dinein: 0, takeaway: 0, served: 0 },
     revenueChart: [],
     chefStats: [],
-    recentOrders: []
+    recentOrders: [],
   });
   const [chefName, setChefName] = useState("");
   const [reload, setReload] = useState(false);
@@ -38,10 +38,12 @@ const Dashboard = () => {
   const handleAddChef = async () => {
     if (!chefName.trim()) return;
     try {
-      await axios.post("http://localhost:5000/api/dashboard/chef", { name: chefName });
+      await axios.post("http://localhost:5000/api/dashboard/chef", {
+        name: chefName,
+      });
       setChefName("");
       setReload(!reload);
-    } catch  {
+    } catch {
       alert("Error adding chef");
     }
   };
@@ -52,29 +54,54 @@ const Dashboard = () => {
     <div className={styles.dashboard}>
       {/* Top Summary Row */}
       <div className={styles.summaryRow}>
-        <div className={styles.card}><h3>Total Chef</h3><p>{data.totalChef}</p></div>
-        <div className={styles.card}><h3>Total Revenue</h3><p>₹{data.totalRevenue}</p></div>
-        <div className={styles.card}><h3>Total Orders</h3><p>{data.totalOrders}</p></div>
-        <div className={styles.card}><h3>Total Clients</h3><p>{data.totalClients}</p></div>
+        <div className={styles.card}>
+          <h3>Total Chef</h3>
+          <p>{data.totalChef}</p>
+        </div>
+        <div className={styles.card}>
+          <h3>Total Revenue</h3>
+          <p>₹{data.totalRevenue}</p>
+        </div>
+        <div className={styles.card}>
+          <h3>Total Orders</h3>
+          <p>{data.totalOrders}</p>
+        </div>
+        <div className={styles.card}>
+          <h3>Total Clients</h3>
+          <p>{data.totalClients}</p>
+        </div>
       </div>
 
       {/* Three Horizontal Sections */}
       <div className={styles.middleRow}>
-        <div className={styles.box}><h3>Revenue (Daily)</h3><RevenueChart data={data.revenueChart} /></div>
+        <div className={styles.box}>
+          <h3>Revenue (Daily)</h3>
+          <RevenueChart data={data.revenueChart} />
+        </div>
         <div className={styles.box}>
           <h3>Order Summary</h3>
           <div className={styles.summaryDetails}>
-            <p><strong>Served:</strong> {data.orderSummary.served}</p>
-            <p><strong>Dine In:</strong> {data.orderSummary.dinein}</p>
-            <p><strong>Take Away:</strong> {data.orderSummary.takeaway}</p>
+            <p>
+              <strong>Served:</strong> {data.orderSummary.served}
+            </p>
+            <p>
+              <strong>Dine In:</strong> {data.orderSummary.dinein}
+            </p>
+            <p>
+              <strong>Take Away:</strong> {data.orderSummary.takeaway}
+            </p>
           </div>
           <OrderPieChart data={data.orderSummary} />
         </div>
         <div className={styles.box}>
           <h3>Table Stats</h3>
           <div className={styles.tableStats}>
-            <div className={styles.tableCard + " " + styles.reserved}>Reserved: {data.tableStats.reserved}</div>
-            <div className={styles.tableCard + " " + styles.available}>Available: {data.tableStats.available}</div>
+            <div className={styles.tableCard + " " + styles.reserved}>
+              Reserved: {data.tableStats.reserved}
+            </div>
+            <div className={styles.tableCard + " " + styles.available}>
+              Available: {data.tableStats.available}
+            </div>
           </div>
         </div>
       </div>
@@ -101,4 +128,4 @@ const Dashboard = () => {
     </div>
   );
 };
-export default Dashboard
+export default Dashboard;

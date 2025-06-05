@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import styles from '../styles/Table.module.css';
+import React, { useEffect, useState } from "react";
+import styles from "../styles/Table.module.css";
 
 export default function TableManagement() {
   const [tables, setTables] = useState([]);
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [chairs, setChairs] = useState(1);
   const [showCreateBox, setShowCreateBox] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchTables();
@@ -14,12 +14,12 @@ export default function TableManagement() {
 
   const fetchTables = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/tables');
+      const res = await fetch("http://localhost:5000/api/tables");
       const data = await res.json();
 
       const sorted = data.sort((a, b) => {
-        const numA = parseInt(a.name.replace(/\D/g, '')) || 0;
-        const numB = parseInt(b.name.replace(/\D/g, '')) || 0;
+        const numA = parseInt(a.name.replace(/\D/g, "")) || 0;
+        const numB = parseInt(b.name.replace(/\D/g, "")) || 0;
         return numA - numB;
       });
 
@@ -28,20 +28,20 @@ export default function TableManagement() {
           const correctName = `Table ${index + 1}`;
           if (table.name !== correctName) {
             await fetch(`http://localhost:5000/api/tables/${table._id}`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ name: correctName }),
             });
             return { ...table, name: correctName };
           }
           return table;
-        })
+        }),
       );
 
       setTables(renamed);
       setName(`${renamed.length + 1}`);
     } catch (error) {
-      console.error('Error fetching tables:', error);
+      console.error("Error fetching tables:", error);
     }
   };
 
@@ -55,9 +55,9 @@ export default function TableManagement() {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/tables', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("http://localhost:5000/api/tables", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: tableName, chairs: chairCount }),
       });
 
@@ -67,11 +67,11 @@ export default function TableManagement() {
         fetchTables();
       } else {
         const errorText = await res.text();
-        console.error('Create table failed:', errorText);
-        alert('Failed to create table.');
+        console.error("Create table failed:", errorText);
+        alert("Failed to create table.");
       }
     } catch (error) {
-      console.error('Error creating table:', error);
+      console.error("Error creating table:", error);
     }
   };
 
@@ -79,21 +79,21 @@ export default function TableManagement() {
     if (!window.confirm("Delete this table?")) return;
     try {
       const res = await fetch(`http://localhost:5000/api/tables/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
       if (res.ok) {
         fetchTables();
       }
     } catch (error) {
-      console.error('Error deleting table:', error);
+      console.error("Error deleting table:", error);
     }
   };
 
   const toggleReservation = async (id, currentStatus) => {
     try {
       const res = await fetch(`http://localhost:5000/api/tables/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isReserved: !currentStatus }),
       });
 
@@ -101,12 +101,12 @@ export default function TableManagement() {
         fetchTables();
       }
     } catch (error) {
-      console.error('Error toggling reservation:', error);
+      console.error("Error toggling reservation:", error);
     }
   };
 
   const filteredTables = tables.filter((t) =>
-    t.name.toLowerCase().includes(searchTerm.toLowerCase())
+    t.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -140,14 +140,17 @@ export default function TableManagement() {
             >
               {[...Array(10)].map((_, i) => (
                 <option key={i + 1} value={i + 1}>
-                  {String(i + 1).padStart(2, '0')}
+                  {String(i + 1).padStart(2, "0")}
                 </option>
               ))}
             </select>
             <button className={styles.createBtn} onClick={handleCreate}>
               Create
             </button>
-            <button className={styles.cancelBtn} onClick={() => setShowCreateBox(false)}>
+            <button
+              className={styles.cancelBtn}
+              onClick={() => setShowCreateBox(false)}
+            >
               Cancel
             </button>
           </div>
@@ -156,26 +159,37 @@ export default function TableManagement() {
         {filteredTables.map((t) => (
           <div
             key={t._id}
-            className={`${styles.card} ${t.isReserved ? styles.reserved : ''}`}
+            className={`${styles.card} ${t.isReserved ? styles.reserved : ""}`}
           >
             <strong>{t.name}</strong>
 
             <p className={styles.chairLine}>
-              <img src="/assets/logo/chair.png" alt="Chair" className={styles.icon} />
+              <img
+                src="/assets/logo/chair.png"
+                alt="Chair"
+                className={styles.icon}
+              />
               {t.chairs}
             </p>
 
-            <p>Status: {t.isReserved ? 'Reserved' : 'Available'}</p>
+            <p>Status: {t.isReserved ? "Reserved" : "Available"}</p>
 
             <button
               className={styles.toggleBtn}
               onClick={() => toggleReservation(t._id, t.isReserved)}
             >
-              {t.isReserved ? 'Mark Available' : 'Mark Reserved'}
+              {t.isReserved ? "Mark Available" : "Mark Reserved"}
             </button>
 
-            <button className={styles.iconBtn} onClick={() => handleDelete(t._id)}>
-              <img src="/assets/logo/delete.png" alt="Delete" className={styles.icon} />
+            <button
+              className={styles.iconBtn}
+              onClick={() => handleDelete(t._id)}
+            >
+              <img
+                src="/assets/logo/delete.png"
+                alt="Delete"
+                className={styles.icon}
+              />
             </button>
           </div>
         ))}

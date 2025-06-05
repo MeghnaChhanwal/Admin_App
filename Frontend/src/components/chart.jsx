@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Legend
+  Legend,
 } from "recharts";
 
 // Colors for Pie slices
@@ -19,7 +19,7 @@ const COLORS = ["#0088FE", "#FF8042"];
 export const OrderPieChart = ({ data }) => {
   const chartData = [
     { name: "Dine-in", value: data.dinein || 0 },
-    { name: "Takeaway", value: data.takeaway || 0 }
+    { name: "Takeaway", value: data.takeaway || 0 },
   ];
 
   return (

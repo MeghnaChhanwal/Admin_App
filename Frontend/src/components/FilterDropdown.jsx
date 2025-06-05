@@ -15,7 +15,9 @@ const FilterDropdown = ({ selected, onSelect, onClear }) => {
       >
         <option value="">Filter...</option>
         {options.map((option) => (
-          <option key={option} value={option}>{option}</option>
+          <option key={option} value={option}>
+            {option}
+          </option>
         ))}
       </select>
       {selected && (

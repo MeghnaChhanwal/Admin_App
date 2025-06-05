@@ -115,7 +115,7 @@ export default function Order() {
   const reservedTableIds = new Set(
     orders
       .filter((o) => o.table?._id && o.status !== "Done")
-      .map((o) => o.table._id)
+      .map((o) => o.table._id),
   );
 
   return (
@@ -132,10 +132,14 @@ export default function Order() {
               style={{ animationDelay: `${idx * 100}ms` }}
             >
               <div className={styles.statusLine}>
-                <span className={`${styles.status} ${styles[order.status.replace(/\s/g, "").toLowerCase()]}`}>
+                <span
+                  className={`${styles.status} ${styles[order.status.replace(/\s/g, "").toLowerCase()]}`}
+                >
                   {order.status}
                 </span>
-                <span className={styles.duration}>{getDuration(order.createdAt)}</span>
+                <span className={styles.duration}>
+                  {getDuration(order.createdAt)}
+                </span>
               </div>
 
               <div className={styles.items}>
@@ -210,7 +214,7 @@ export default function Order() {
                         <option key={status} value={status}>
                           {status}
                         </option>
-                      )
+                      ),
                     )}
                   </select>
 
@@ -262,7 +266,9 @@ export default function Order() {
                             disabled={reservedTableIds.has(table._id)}
                           >
                             {table.name}{" "}
-                            {reservedTableIds.has(table._id) ? "(Reserved)" : ""}
+                            {reservedTableIds.has(table._id)
+                              ? "(Reserved)"
+                              : ""}
                           </option>
                         ))}
                       </select>
@@ -282,7 +288,7 @@ export default function Order() {
                         >
                           {status}
                         </button>
-                      )
+                      ),
                     )}
                   </div>
 

@@ -1,6 +1,6 @@
 .container {
   padding: 1.5rem;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
   background-color: #f9f9f9;
   min-height: 100vh;
 }
@@ -26,7 +26,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);  /* exactly 5 columns */
+  grid-template-columns: repeat(5, 1fr); /* exactly 5 columns */
   gap: 1rem;
   justify-content: center;
 }
@@ -36,9 +36,11 @@
   border-radius: 16px;
   padding: 1rem;
   text-align: center;
-  position: relative;  /* for image positioning */
+  position: relative; /* for image positioning */
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   animation-duration: 0.8s;
   animation-fill-mode: both;
   cursor: default;
@@ -82,7 +84,8 @@
   font-size: 1rem;
 }
 
-.createBtn, .cancelBtn {
+.createBtn,
+.cancelBtn {
   display: block;
   width: 100%;
   padding: 0.6rem;
@@ -232,7 +235,8 @@
 }
 
 @keyframes moveDownRight {
-  0%, 100% {
+  0%,
+  100% {
     top: 12px;
     right: 12px;
   }
@@ -243,7 +247,8 @@
 }
 
 @keyframes moveUpRight {
-  0%, 100% {
+  0%,
+  100% {
     top: 32px;
     right: 12px;
   }
