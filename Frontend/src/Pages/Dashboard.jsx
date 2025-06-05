@@ -16,15 +16,18 @@ const Dashboard = () => {
     chefStats: [],
     recentOrders: [],
   });
+
   const [chefName, setChefName] = useState("");
   const [reload, setReload] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const API_BASE_URL = import.meta.env.VITE_ADMIN_API_URL;
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get("http://localhost:5000/api/dashboard");
+        const res = await axios.get(`${API_BASE_URL}/api/dashboard`);
         setData(res.data);
       } catch (err) {
         console.error("Failed to fetch dashboard data:", err);
@@ -33,12 +36,12 @@ const Dashboard = () => {
       }
     };
     fetchData();
-  }, [reload]);
+  }, [reload, API_BASE_URL]);
 
   const handleAddChef = async () => {
     if (!chefName.trim()) return;
     try {
-      await axios.post("http://localhost:5000/api/dashboard/chef", {
+      await axios.post(`${API_BASE_URL}/api/dashboard/chef`, {
         name: chefName,
       });
       setChefName("");
@@ -96,10 +99,10 @@ const Dashboard = () => {
         <div className={styles.box}>
           <h3>Table Stats</h3>
           <div className={styles.tableStats}>
-            <div className={styles.tableCard + " " + styles.reserved}>
+            <div className={`${styles.tableCard} ${styles.reserved}`}>
               Reserved: {data.tableStats.reserved}
             </div>
-            <div className={styles.tableCard + " " + styles.available}>
+            <div className={`${styles.tableCard} ${styles.available}`}>
               Available: {data.tableStats.available}
             </div>
           </div>
@@ -128,4 +131,5 @@ const Dashboard = () => {
     </div>
   );
 };
+
 export default Dashboard;
