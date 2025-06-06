@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import styles from "../styles/Order.module.css";
 
-// Loading shimmer component inside this file for simplicity
+const API_BASE = import.meta.env.VITE_ADMIN_API_URL;
+
 function LoadingShimmer() {
   return (
     <div className={styles.shimmerWrapper}>
@@ -36,7 +37,7 @@ export default function Order() {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/orders");
+      const res = await fetch(`${API_BASE}/api/orders`);
       const data = await res.json();
       setOrders(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -46,7 +47,7 @@ export default function Order() {
 
   const fetchChefs = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/chefs");
+      const res = await fetch(`${API_BASE}/api/chefs`);
       const data = await res.json();
       setChefs(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -56,7 +57,7 @@ export default function Order() {
 
   const fetchTables = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/tables");
+      const res = await fetch(`${API_BASE}/api/tables`);
       const data = await res.json();
       setTables(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -66,7 +67,7 @@ export default function Order() {
 
   const updateOrderAPI = async (orderId, body) => {
     try {
-      await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+      await fetch(`${API_BASE}/api/orders/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -115,7 +116,7 @@ export default function Order() {
   const reservedTableIds = new Set(
     orders
       .filter((o) => o.table?._id && o.status !== "Done")
-      .map((o) => o.table._id),
+      .map((o) => o.table._id)
   );
 
   return (
@@ -207,14 +208,16 @@ export default function Order() {
                   <label>Status:</label>
                   <select
                     value={editData.status}
-                    onChange={(e) => handleEditChange("status", e.target.value)}
+                    onChange={(e) =>
+                      handleEditChange("status", e.target.value)
+                    }
                   >
                     {["Processing", "Served", "Not Picked up", "Done"].map(
                       (status) => (
                         <option key={status} value={status}>
                           {status}
                         </option>
-                      ),
+                      )
                     )}
                   </select>
 
@@ -280,7 +283,9 @@ export default function Order() {
                       (status) => (
                         <button
                           key={status}
-                          onClick={() => handleStatusChange(order._id, status)}
+                          onClick={() =>
+                            handleStatusChange(order._id, status)
+                          }
                           disabled={status === "Done" && !order.table}
                           className={`${styles.statusBtn} ${
                             order.status === status ? styles.active : ""
@@ -288,7 +293,7 @@ export default function Order() {
                         >
                           {status}
                         </button>
-                      ),
+                      )
                     )}
                   </div>
 

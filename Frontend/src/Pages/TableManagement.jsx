@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import styles from "../styles/Table.module.css";
 
 export default function TableManagement() {
@@ -8,26 +8,27 @@ export default function TableManagement() {
   const [showCreateBox, setShowCreateBox] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => {
-    fetchTables();
-  }, []);
+  const API_BASE_URL = import.meta.env.VITE_ADMIN_API_URL;
 
-  const fetchTables = async () => {
+  // Fetch tables and rename them sequentially if needed
+  const fetchTables = useCallback(async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/tables");
+      const res = await fetch(`${API_BASE_URL}/api/tables`);
       const data = await res.json();
 
+      // Sort tables by their number suffix
       const sorted = data.sort((a, b) => {
         const numA = parseInt(a.name.replace(/\D/g, "")) || 0;
         const numB = parseInt(b.name.replace(/\D/g, "")) || 0;
         return numA - numB;
       });
 
+      // Rename tables if name does not match "Table X" pattern sequentially
       const renamed = await Promise.all(
         sorted.map(async (table, index) => {
           const correctName = `Table ${index + 1}`;
           if (table.name !== correctName) {
-            await fetch(`http://localhost:5000/api/tables/${table._id}`, {
+            await fetch(`${API_BASE_URL}/api/tables/${table._id}`, {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ name: correctName }),
@@ -35,7 +36,7 @@ export default function TableManagement() {
             return { ...table, name: correctName };
           }
           return table;
-        }),
+        })
       );
 
       setTables(renamed);
@@ -43,7 +44,11 @@ export default function TableManagement() {
     } catch (error) {
       console.error("Error fetching tables:", error);
     }
-  };
+  }, [API_BASE_URL]);
+
+  useEffect(() => {
+    fetchTables();
+  }, [fetchTables]);
 
   const handleCreate = async () => {
     const tableName = name ? `Table ${name}` : `Table ${tables.length + 1}`;
@@ -55,7 +60,7 @@ export default function TableManagement() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/tables", {
+      const res = await fetch(`${API_BASE_URL}/api/tables`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: tableName, chairs: chairCount }),
@@ -78,7 +83,7 @@ export default function TableManagement() {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this table?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/tables/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/tables/${id}`, {
         method: "DELETE",
       });
       if (res.ok) {
@@ -91,7 +96,7 @@ export default function TableManagement() {
 
   const toggleReservation = async (id, currentStatus) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/tables/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/tables/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isReserved: !currentStatus }),
@@ -105,8 +110,9 @@ export default function TableManagement() {
     }
   };
 
+  // Filter tables by search term
   const filteredTables = tables.filter((t) =>
-    t.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    t.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -159,10 +165,11 @@ export default function TableManagement() {
         {filteredTables.map((t) => (
           <div
             key={t._id}
-            className={`${styles.card} ${t.isReserved ? styles.reserved : ""}`}
+            className={`${styles.card} ${
+              t.isReserved ? styles.reserved : ""
+            }`}
           >
             <strong>{t.name}</strong>
-
             <p className={styles.chairLine}>
               <img
                 src="/assets/logo/chair.png"
@@ -171,7 +178,6 @@ export default function TableManagement() {
               />
               {t.chairs}
             </p>
-
             <p>Status: {t.isReserved ? "Reserved" : "Available"}</p>
 
             <button

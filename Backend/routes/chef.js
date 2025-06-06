@@ -1,9 +1,16 @@
-// Backend/routes/chef.js
 const express = require("express");
 const router = express.Router();
-const chefController = require("../controllers/chef");
+const Chef = require("../models/Chef");
 
-router.get("/", chefController.getChefs);
-router.post("/", chefController.createChef);
+// GET all chefs
+router.get("/", async (req, res) => {
+  try {
+    const chefs = await Chef.find();
+    res.json(chefs);
+  } catch (error) {
+    console.error("Error fetching chefs:", error);
+    res.status(500).json({ message: "Failed to fetch chefs" });
+  }
+});
 
 module.exports = router;

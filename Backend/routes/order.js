@@ -1,17 +1,16 @@
+// /routes/orderRoutes.js
 const express = require("express");
 const router = express.Router();
-const orderController = require("../controllers/order");
+const Order = require("../models/Order");
 
-// GET सर्व ऑर्डर्स
-router.get("/", orderController.getOrders);
-
-// POST नवीन ऑर्डर तयार करणे
-router.post("/", orderController.createOrder);
-
-// PUT ऑर्डर अपडेट करणे
-router.put("/:id", orderController.updateOrder);
-
-// DELETE ऑर्डर हटवणे
-router.delete("/:id", orderController.deleteOrder);
+// GET /api/orders
+router.get("/api/orders", async (req, res) => {
+  try {
+    const orders = await Order.find();
+    res.json(orders); // data properly send केलं पाहिजे
+  } catch (err) {
+    res.status(500).json({ error: "Server Error" });
+  }
+});
 
 module.exports = router;

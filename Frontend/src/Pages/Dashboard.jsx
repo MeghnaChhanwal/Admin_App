@@ -1,131 +1,112 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import styles from "../styles/Dashboard.module.css";
 import { RevenueChart, OrderPieChart } from "../components/chart";
+import axios from "axios";
 
 const Dashboard = () => {
-  const [data, setData] = useState({
-    totalChef: 0,
-    totalRevenue: 0,
-    totalOrders: 0,
-    totalClients: 0,
-    thisWeekRevenue: 0,
-    tableStats: { reserved: 0, available: 0 },
-    orderSummary: { dinein: 0, takeaway: 0, served: 0 },
-    revenueChart: [],
-    chefStats: [],
-    recentOrders: [],
-  });
-
-  const [chefName, setChefName] = useState("");
-  const [reload, setReload] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const API_BASE_URL = import.meta.env.VITE_ADMIN_API_URL;
+  const [data, setData] = useState(null);
+  const adminUrl = import.meta.env.VITE_ADMIN_API_URL;
+  const userUrl = import.meta.env.VITE_USER_API_URL;
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/dashboard`);
-        setData(res.data);
+        const [adminRes, userRes] = await Promise.all([
+          axios.get(`${adminUrl}/api/dashboard`),
+          axios.get(`${userUrl}/api/orders`)  // ✅ Correct endpoint
+        ]);
+
+        const userOrders = userRes.data || [];
+
+        const totalRevenue = userOrders.reduce(
+          (total, order) => total + (order.totalAmount || 0),
+          0
+        );
+
+        const uniqueClients = new Set(
+          userOrders.map((order) => order.user?.mobile)
+        ).size;
+
+        setData({
+          chefs: adminRes.data.chefs || [],
+          tables: adminRes.data.tables || [],
+          orders: userOrders,
+          revenue: totalRevenue,
+          totalClients: uniqueClients,
+        });
       } catch (err) {
-        console.error("Failed to fetch dashboard data:", err);
-      } finally {
-        setLoading(false);
+        console.error("❌ Failed to fetch dashboard data:", err);
       }
     };
+
     fetchData();
-  }, [reload, API_BASE_URL]);
+  }, []);
 
-  const handleAddChef = async () => {
-    if (!chefName.trim()) return;
-    try {
-      await axios.post(`${API_BASE_URL}/api/dashboard/chef`, {
-        name: chefName,
-      });
-      setChefName("");
-      setReload(!reload);
-    } catch {
-      alert("Error adding chef");
-    }
-  };
-
-  if (loading) return <div className={styles.loading}>Loading...</div>;
+  const totalChefs = data?.chefs?.length || 0;
+  const totalOrders = data?.orders?.length || 0;
+  const totalRevenue = data?.revenue || 0;
+  const totalClients = data?.totalClients || 0;
+  const reservedTables = data?.tables?.filter(t => t.isReserved)?.length || 0;
+  const availableTables = (data?.tables?.length || 0) - reservedTables;
 
   return (
     <div className={styles.dashboard}>
-      {/* Top Summary Row */}
-      <div className={styles.summaryRow}>
-        <div className={styles.card}>
-          <h3>Total Chef</h3>
-          <p>{data.totalChef}</p>
-        </div>
-        <div className={styles.card}>
-          <h3>Total Revenue</h3>
-          <p>₹{data.totalRevenue}</p>
-        </div>
-        <div className={styles.card}>
-          <h3>Total Orders</h3>
-          <p>{data.totalOrders}</p>
-        </div>
-        <div className={styles.card}>
-          <h3>Total Clients</h3>
-          <p>{data.totalClients}</p>
-        </div>
+      <div className={styles.header}>Analytics</div>
+
+      <div className={styles.summaryGrid}>
+        <div className={styles.box}><h4>Total Chefs</h4><p>{totalChefs}</p></div>
+        <div className={styles.box}><h4>Total Revenue</h4><p>₹{totalRevenue}K</p></div>
+        <div className={styles.box}><h4>Total Orders</h4><p>{totalOrders}</p></div>
+        <div className={styles.box}><h4>Total Clients</h4><p>{totalClients}</p></div>
       </div>
 
-      {/* Three Horizontal Sections */}
-      <div className={styles.middleRow}>
-        <div className={styles.box}>
-          <h3>Revenue (Daily)</h3>
-          <RevenueChart data={data.revenueChart} />
+      <div className={styles.graphGrid}>
+        <div className={styles.graphBox}>
+          <h3>Revenue</h3>
+          <RevenueChart orders={data?.orders || []} />
         </div>
-        <div className={styles.box}>
+        <div className={styles.graphBox}>
           <h3>Order Summary</h3>
-          <div className={styles.summaryDetails}>
-            <p>
-              <strong>Served:</strong> {data.orderSummary.served}
-            </p>
-            <p>
-              <strong>Dine In:</strong> {data.orderSummary.dinein}
-            </p>
-            <p>
-              <strong>Take Away:</strong> {data.orderSummary.takeaway}
-            </p>
-          </div>
-          <OrderPieChart data={data.orderSummary} />
+          <OrderPieChart orders={data?.orders || []} />
         </div>
-        <div className={styles.box}>
-          <h3>Table Stats</h3>
-          <div className={styles.tableStats}>
-            <div className={`${styles.tableCard} ${styles.reserved}`}>
-              Reserved: {data.tableStats.reserved}
-            </div>
-            <div className={`${styles.tableCard} ${styles.available}`}>
-              Available: {data.tableStats.available}
-            </div>
+        <div className={styles.graphBox}>
+          <h3>Tables</h3>
+          <div className={styles.tables}>
+            {Array.from({ length: 30 }, (_, i) => {
+              const id = i + 1;
+              const reserved = data?.tables?.some(
+                (t) => t.name === `Table ${id}` && t.isReserved
+              );
+              return (
+                <div
+                  key={id}
+                  className={`${styles.tableBox} ${
+                    reserved ? styles.reserved : styles.available
+                  }`}
+                >
+                  Table {String(id).padStart(2, "0")}
+                </div>
+              );
+            })}
+          </div>
+          <div className={styles.tableLegend}>
+            <span className={`${styles.legendBox} ${styles.reserved}`}></span>{" "}
+            Reserved
+            <span className={`${styles.legendBox} ${styles.available}`}></span>{" "}
+            Available
           </div>
         </div>
       </div>
 
-      {/* Chef Section */}
       <div className={styles.chefSection}>
-        <h3>Chef : Order Count</h3>
-        {data.chefStats.map((chef, idx) => (
-          <div key={idx} className={styles.chefRow}>
-            <span>{chef.name}</span>
-            <span>{chef.orders}</span>
-          </div>
-        ))}
-        <div className={styles.addChef}>
-          <input
-            type="text"
-            placeholder="New Chef Name"
-            value={chefName}
-            onChange={(e) => setChefName(e.target.value)}
-          />
-          <button onClick={handleAddChef}>Add Chef</button>
+        <h3>Chef Name</h3>
+        <div className={styles.chefGrid}>
+          {data?.chefs?.map((chef) => (
+            <div key={chef._id} className={styles.chefCard}>
+              <p>{chef.name}</p>
+              <span>Orders: {chef.orderCount || 0}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

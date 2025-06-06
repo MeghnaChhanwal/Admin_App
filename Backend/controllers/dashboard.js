@@ -1,46 +1,44 @@
-const Order = require("../models/Order");
+const Order = require('../models/Order');
+const Chef = require('../models/Chef');
+const Table = require('../models/Table');
 
 exports.getDashboardData = async (req, res) => {
   try {
-    // 1. Total Revenue (सर्व ऑर्डरमधील totalAmount ची बेरीज)
-    const totalRevenueAgg = await Order.aggregate([
-      { $group: { _id: null, total: { $sum: "$totalAmount" } } },
-    ]);
-    const totalRevenue = totalRevenueAgg[0]?.total || 0;
+    const chefs = await Chef.find();
+    const orders = await Order.find();
+    const tables = await Table.find();
 
-    // 2. Total Clients (Unique मोबाइल नंबर गिणे)
-    const totalClientsAgg = await Order.aggregate([
-      { $group: { _id: "$user.mobile" } },
-      { $count: "uniqueClients" },
-    ]);
-    const totalClients = totalClientsAgg[0]?.uniqueClients || 0;
+    const totalRevenue = orders.reduce((sum, order) => {
+      const itemTotal = order.cartItems?.reduce((s, i) => s + i.price * i.quantity, 0) || 0;
+      return sum + itemTotal;
+    }, 0);
 
-    // 3. Total Orders (Order collection मधील एकूण documents)
-    const totalOrders = await Order.countDocuments();
+    const dinein = orders.filter(o => o.orderType === 'dinein').length;
+    const takeaway = orders.filter(o => o.orderType === 'takeaway').length;
 
-    // 4. Order Summary (Order Type नुसार counts)
-    const orderSummaryAgg = await Order.aggregate([
-      {
-        $group: {
-          _id: "$orderType",
-          count: { $sum: 1 },
-        },
-      },
-    ]);
-    const orderSummary = { dinein: 0, takeaway: 0, served: 0 };
-    orderSummaryAgg.forEach((item) => {
-      orderSummary[item._id] = item.count;
-    });
+    const clients = [...new Set(orders.map(o => o.user.mobile))];
 
-    // Response म्हणून पाठवणे
+    const chefStats = chefs.map(chef => ({
+      name: chef.name,
+      orders: orders.filter(o => o.chef === chef.name).length,
+    }));
+
+    const reserved = tables.filter(t => t.isReserved).length;
+    const available = tables.length - reserved;
+
     res.json({
+      totalChef: chefs.length,
       totalRevenue,
-      totalClients,
-      totalOrders,
-      orderSummary,
+      totalOrders: orders.length,
+      totalClients: clients.length,
+      orderSummary: { dinein, takeaway },
+      tableStats: { reserved, available },
+      chefStats,
+      tables: tables.map(t => t.name),
+      orders,
     });
   } catch (err) {
-    console.error("Dashboard data error:", err);
-    res.status(500).json({ message: "Failed to get dashboard data" });
+    console.error(err);
+    res.status(500).json({ error: 'Dashboard fetch failed' });
   }
 };

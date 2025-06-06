@@ -1,62 +1,119 @@
-import React from "react";
 import {
-  PieChart,
-  Pie,
-  Cell,
+  Chart as ChartJS,
+  LineElement,
+  PointElement,
+  LineController,
+  CategoryScale,
+  LinearScale,
+  Title,
   Tooltip,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
   Legend,
-} from "recharts";
+  Filler,
+  ArcElement
+} from "chart.js";
 
-// Colors for Pie slices
-const COLORS = ["#0088FE", "#FF8042"];
+import { Line, Pie } from "react-chartjs-2";
 
-// Pie Chart: Order Summary
-export const OrderPieChart = ({ data }) => {
-  const chartData = [
-    { name: "Dine-in", value: data.dinein || 0 },
-    { name: "Takeaway", value: data.takeaway || 0 },
-  ];
+// Register chart components
+ChartJS.register(
+  LineElement,
+  PointElement,
+  LineController,
+  CategoryScale,
+  LinearScale,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,  // 👈 Required for fill to work
+  ArcElement
+);
 
-  return (
-    <PieChart width={300} height={250}>
-      <Pie
-        data={chartData}
-        cx="50%"
-        cy="50%"
-        outerRadius={80}
-        fill="#8884d8"
-        dataKey="value"
-        label
-      >
-        {chartData.map((_, index) => (
-          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-        ))}
-      </Pie>
-      <Tooltip />
-    </PieChart>
-  );
+// ⭕ Pie Chart – Dine In vs Takeaway
+export const OrderPieChart = ({ orders }) => {
+  const dinein = orders.filter(o => o.orderType === "dinein").length;
+  const takeaway = orders.filter(o => o.orderType === "takeaway").length;
+
+  const data = {
+    labels: ["Dine In", "Take Away"],
+    datasets: [
+      {
+        label: "Order Type",
+        data: [dinein, takeaway],
+        backgroundColor: ["#4caf50", "#f44336"],
+        hoverOffset: 6,
+      },
+    ],
+  };
+
+  return <Pie data={data} />;
 };
 
-// Line Chart: Revenue over time
-export const RevenueChart = ({ data }) => {
-  return (
-    <LineChart width={500} height={250} data={data}>
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="date" />
-      <YAxis />
-      <Tooltip />
-      <Legend />
-      <Line
-        type="monotone"
-        dataKey="revenue"
-        stroke="#00C49F"
-        strokeWidth={2}
-      />
-    </LineChart>
-  );
+// 📈 Line Chart – Revenue Chart (Daily)
+export const RevenueChart = ({ orders, view = "daily" }) => {
+  const dataMap = {
+    daily: Array(7).fill(0),
+    weekly: Array(4).fill(0),
+    monthly: Array(12).fill(0),
+  };
+
+  orders.forEach(order => {
+    const date = new Date(order.createdAt);
+    const amount = order.cartItems?.reduce((sum, item) => sum + item.price * item.quantity, 0) || 0;
+
+    if (view === "daily") {
+      dataMap.daily[date.getDay()] += amount;
+    } else if (view === "weekly") {
+      const week = Math.floor(date.getDate() / 7);
+      dataMap.weekly[week] += amount;
+    } else if (view === "monthly") {
+      dataMap.monthly[date.getMonth()] += amount;
+    }
+  });
+
+  const labels =
+    view === "daily"
+      ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+      : view === "weekly"
+      ? ["Week 1", "Week 2", "Week 3", "Week 4"]
+      : [
+          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ];
+
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: "Revenue",
+        data: dataMap[view],
+        borderColor: "#3f51b5",
+        backgroundColor: "rgba(63,81,181,0.3)",
+        fill: true,
+        tension: 0.4,
+        pointRadius: 4,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: { display: true },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => `₹${ctx.parsed.y}`,
+        },
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: (value) => `₹${value}`,
+        },
+      },
+    },
+  };
+
+  return <Line data={chartData} options={options} />;
 };
