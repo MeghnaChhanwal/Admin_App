@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "../styles/Dashboard.module.css";
-import { RevenueChart, OrderPieChart } from "../components/Chart";
+import { RevenueChart, OrderPieChart } from "../components/chart";
 import axios from "axios";
 
 const API_ADMIN_URL = import.meta.env.VITE_ADMIN_API_URL;
