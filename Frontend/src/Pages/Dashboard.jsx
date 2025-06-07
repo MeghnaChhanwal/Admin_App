@@ -12,7 +12,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // ✅ Fetch all data on mount
+
   useEffect(() => {
     const fetchData = async () => {
       try {
