@@ -1,16 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const Table = require("../models/Table");
+const tableController = require("../controllers/table");
 
-router.post("/", async (req, res) => {
-  try {
-    const { tableNumber, reserved } = req.body;
-    const table = new Table({ tableNumber, reserved });
-    await table.save();
-    res.status(201).json(table);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+router.get("/", tableController.getTables);
+router.post("/", tableController.createTable);
+router.put("/:id", tableController.updateTable);
+router.delete("/:id", tableController.deleteTable);
 
 module.exports = router;

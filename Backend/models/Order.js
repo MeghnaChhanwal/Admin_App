@@ -7,7 +7,7 @@ const OrderSchema = new mongoose.Schema({
     mobile: String,
     address: String,
   },
-  orderType: String,
+  orderType: String,  // e.g. "Dine In", "Take Away"
   totalPrepTime: Number,
   createdAt: { type: Date, default: Date.now },
   status: { type: String, default: 'processing' },

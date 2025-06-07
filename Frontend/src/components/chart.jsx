@@ -1,96 +1,52 @@
+import React from "react";
 import {
   Chart as ChartJS,
-  LineElement,
-  PointElement,
-  LineController,
   CategoryScale,
   LinearScale,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
-  Filler,
-  ArcElement
+  ArcElement,
 } from "chart.js";
-
 import { Line, Pie } from "react-chartjs-2";
 
-// Register chart components
+// Register chart.js components
 ChartJS.register(
-  LineElement,
-  PointElement,
-  LineController,
   CategoryScale,
   LinearScale,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
-  Filler,  // 👈 Required for fill to work
   ArcElement
 );
 
-// ⭕ Pie Chart – Dine In vs Takeaway
-export const OrderPieChart = ({ orders }) => {
-  const dinein = orders.filter(o => o.orderType === "dinein").length;
-  const takeaway = orders.filter(o => o.orderType === "takeaway").length;
+// Revenue Line Chart component
+export const RevenueChart = ({ orders }) => {
+  // Group revenue by date (YYYY-MM-DD)
+  const revenueByDate = orders.reduce((acc, order) => {
+    const date = new Date(order.createdAt).toISOString().split("T")[0]; // e.g. '2025-06-06'
+    const amount = order.totalAmount || order.grandTotal || 0;
+    acc[date] = (acc[date] || 0) + amount;
+    return acc;
+  }, {});
+
+  // Sort dates ascending
+  const sortedDates = Object.keys(revenueByDate).sort();
 
   const data = {
-    labels: ["Dine In", "Take Away"],
+    labels: sortedDates,
     datasets: [
       {
-        label: "Order Type",
-        data: [dinein, takeaway],
-        backgroundColor: ["#4caf50", "#f44336"],
-        hoverOffset: 6,
-      },
-    ],
-  };
-
-  return <Pie data={data} />;
-};
-
-// 📈 Line Chart – Revenue Chart (Daily)
-export const RevenueChart = ({ orders, view = "daily" }) => {
-  const dataMap = {
-    daily: Array(7).fill(0),
-    weekly: Array(4).fill(0),
-    monthly: Array(12).fill(0),
-  };
-
-  orders.forEach(order => {
-    const date = new Date(order.createdAt);
-    const amount = order.cartItems?.reduce((sum, item) => sum + item.price * item.quantity, 0) || 0;
-
-    if (view === "daily") {
-      dataMap.daily[date.getDay()] += amount;
-    } else if (view === "weekly") {
-      const week = Math.floor(date.getDate() / 7);
-      dataMap.weekly[week] += amount;
-    } else if (view === "monthly") {
-      dataMap.monthly[date.getMonth()] += amount;
-    }
-  });
-
-  const labels =
-    view === "daily"
-      ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-      : view === "weekly"
-      ? ["Week 1", "Week 2", "Week 3", "Week 4"]
-      : [
-          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-        ];
-
-  const chartData = {
-    labels,
-    datasets: [
-      {
-        label: "Revenue",
-        data: dataMap[view],
-        borderColor: "#3f51b5",
-        backgroundColor: "rgba(63,81,181,0.3)",
+        label: "Revenue (₹)",
+        data: sortedDates.map((date) => revenueByDate[date]),
+        borderColor: "rgb(75, 192, 192)",
+        backgroundColor: "rgba(75, 192, 192, 0.2)",
         fill: true,
-        tension: 0.4,
-        pointRadius: 4,
+        tension: 0.3, // smooth curve
       },
     ],
   };
@@ -98,22 +54,44 @@ export const RevenueChart = ({ orders, view = "daily" }) => {
   const options = {
     responsive: true,
     plugins: {
-      legend: { display: true },
-      tooltip: {
-        callbacks: {
-          label: (ctx) => `₹${ctx.parsed.y}`,
-        },
-      },
+      legend: { position: "top" },
+      title: { display: true, text: "Daily Revenue" },
     },
     scales: {
       y: {
         beginAtZero: true,
         ticks: {
+          // Format y-axis ticks with ₹
           callback: (value) => `₹${value}`,
         },
       },
     },
   };
 
-  return <Line data={chartData} options={options} />;
+  return <Line data={data} options={options} />;
+};
+
+// Order Type Pie Chart component
+export const OrderPieChart = ({ stats }) => {
+  const data = {
+    labels: ["Dine In", "Take Away"],
+    datasets: [
+      {
+        label: "Order Types",
+        data: [stats.dineIn || 0, stats.takeAway || 0],
+        backgroundColor: ["#36A2EB", "#FF6384"],
+        hoverOffset: 20,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: { position: "bottom" },
+      title: { display: true, text: "Order Type Distribution" },
+    },
+  };
+
+  return <Pie data={data} options={options} />;
 };

@@ -1,10 +1,9 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const TableSchema = new mongoose.Schema({
-  name: String,
-  chairs: Number,
-  isReserved: Boolean,
-  status: String
+const tableSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  chairs: { type: Number, default: 4 },
+  isReserved: { type: Boolean, default: false },
 });
 
-module.exports = mongoose.model('Table', TableSchema);
+module.exports = mongoose.model("Table", tableSchema);
